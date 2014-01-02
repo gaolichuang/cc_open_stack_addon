@@ -1,4 +1,4 @@
-cc_open_stack_plugin
+cc_open_stack_addon
 ====================
 
 base on openstack, it is a project Container  
