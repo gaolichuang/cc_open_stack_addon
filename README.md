@@ -10,19 +10,20 @@ base on openstack, it is a project Container
 
 ### project: kvm_monitor
 >desc:   monitor vm (base on kvm)  status, include:
->>>cpuUsage
->>>memUsage
->>>networkReceive
->>>networkTransfer
->>>diskUsage
->>>diskWriteRate
->>>diskReadRate
->>>diskWriteRequest
->>>diskReadRequest
->>>diskWriteDelay
->>>diskReadDelay
->>>diskPartition
->>>disk_usage
->>>loadavg_5
->>>memUsageRate
-> this project reference from https://github.com/aspirer/study/tree/master/nvs_monitor
+>>>cpuUsage  
+>>>memUsage  
+>>>networkReceive  
+>>>networkTransfer  
+>>>diskUsage  
+>>>diskWriteRate  
+>>>diskReadRate  
+>>>diskWriteRequest  
+>>>diskReadRequest  
+>>>diskWriteDelay  
+>>>diskReadDelay  
+>>>diskPartition  
+>>>disk_usage  
+>>>loadavg_5  
+>>>memUsageRate  
+
+>this project reference from https://github.com/aspirer/study/tree/master/nvs_monitor
