@@ -27,3 +27,4 @@ base on openstack, it is a project Container
 >>>memUsageRate  
 
 >this project reference from https://github.com/aspirer/study/tree/master/nvs_monitor
+>this project need to remake qemu-ga, you can see https://github.com/gaolichuang/qemu-1.5.0-dfsg/tree/qga-realpath-statvfs
