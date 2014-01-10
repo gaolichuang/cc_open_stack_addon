@@ -66,7 +66,8 @@ def _get_token():
                              "password": CONF.admin_password}}}
     headers = {'content-type': 'application/json'}
     try:
-        full_auth_url = os.path.join(CONF.http_protocol, "://", CONF.auth_api_server,
+        protocol = '%s://' % CONF.http_protocol
+        full_auth_url = os.path.join(protocol, CONF.auth_api_server,
                                      CONF.auth_url_suffix)
         verify = False
         r = requests.post(full_auth_url, data=json.dumps(data),
@@ -97,7 +98,8 @@ def get_all_instances_on_host():
 
     headers = {"Accept": "application/json", "X-Auth-Token": TOKEN}
     params = {"all_tenants": 1, "host": CONF.instances_host}
-    full_api_url = os.path.join(CONF.http_protocol, "://", CONF.nova_api_server,
+    protocol = '%s://' % 'http'
+    full_api_url = os.path.join(protocol, CONF.nova_api_server,
                                 CONF.nova_api_version, TENANT_ID,
                                 CONF.nova_api_url_suffix)
 
@@ -112,6 +114,7 @@ def get_all_instances_on_host():
                 _get_token()
             elif r.status_code == 200:
                 servers = r.json()["servers"]
+                LOG.info("get server %s" % servers)
                 return servers
             else:
                 LOG.error("Get instances error, url: %s, code: %s" %
