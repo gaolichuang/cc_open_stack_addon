@@ -33,3 +33,8 @@ base on openstack, it is a project Container
 >desc: monitor internal service, which use amqp rpc in manager
 >first should change some code, if eventlet thread hang, add greenthread.sleep at  nova/openstack/common/rpc/amqp.py  waiter.put
 >use bascrpc  ping fuction to implement this monitor
+
+### project: ssl  
+>desc:   use for nova-novncproxy support ssl request, script use to generator ssl certification
+
+
