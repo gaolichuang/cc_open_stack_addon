@@ -1,0 +1,105 @@
+<domain type="kvm">
+  <name>instance-40000001</name>
+  <uuid>1f1664e8-4272-4dc2-ae2f-46d87cbf1201</uuid>
+  <memory>31457280</memory>
+  <currentMemory>31457280</currentMemory>
+  <vcpu>4</vcpu>
+  <os>
+    <type>hvm</type>
+    <boot dev="hd"/>
+    <smbios mode="sysinfo"/>
+  </os>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>destroy</on_reboot>
+  <on_crash>destroy</on_crash>
+
+  <sysinfo type="smbios">
+    <system>
+      <entry name="manufacturer">Manufacturer</entry>
+      <entry name="product">Product</entry>
+      <entry name="version">2013.2</entry>
+      <entry name="serial">14454c4c-3500-104e-8036-cac04f433301</entry>
+      <entry name="uuid">1f1664e8-4272-4dc2-ae2f-46d87cbf1201</entry>
+    </system>
+  </sysinfo>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <clock offset="utc">
+    <timer name="pit" tickpolicy="delay"/>
+    <timer name="rtc" tickpolicy="catchup"/>
+  </clock>
+
+  <cpu mode="host-model" match="exact"/>
+  <devices>
+    <emulator>/usr/libexec/qemu-kvm</emulator>
+    <disk type="file" device="disk">
+      <driver name="qemu" type="raw" cache="none"/>
+      <source file='/root/kvm_deploy/vm01/centos-5.8.img'/>
+      <target bus="virtio" dev="vda"/>
+    </disk>
+
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <source dev='/dev/sdb1'/>
+      <target dev='vdb' bus='virtio'/>
+    </disk>
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <source dev='/dev/sdb2'/>
+      <target dev='vdc' bus='virtio'/>
+    </disk>
+
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <source dev='/dev/sdc1'/>
+      <target dev='vdd' bus='virtio'/>
+    </disk>
+
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <source dev='/dev/sdc2'/>
+      <target dev='vde' bus='virtio'/>
+    </disk>
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <source dev='/dev/sdd1'/>
+      <target dev='vdf' bus='virtio'/>
+    </disk>
+
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <source dev='/dev/sdd2'/>
+      <target dev='vdg' bus='virtio'/>
+    </disk>
+
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <source dev='/dev/sdd3'/>
+      <target dev='vdh' bus='virtio'/>
+    </disk>
+
+    <interface type="bridge">
+      <source bridge="br0" />
+      <model type='virtio'/>
+      <mac address="52:54:00:12:34:01" />
+    </interface>
+    <serial type="file">
+      <source path="/root/kvm_deploy/vm01/instance-40001-console.log"/>
+    </serial>
+    <console type='pty' tty='/dev/pts/7'>
+      <source path='/dev/pts/7'/>
+      <target port='0'/>
+    </console>
+    <serial type='pty'>
+      <source path='/dev/pts/7'/>
+      <target port='0'/>
+    </serial>
+    <input type='mouse' bus='ps2'/>
+    <graphics type='vnc' listen="0.0.0.0" autoport='yes' keymap='en-us'/>
+    <video>
+     <model type='vga'/>
+    </video>
+  </devices>
+</domain>
