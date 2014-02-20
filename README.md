@@ -37,4 +37,6 @@ base on openstack, it is a project Container
 ### project: ssl  
 >desc:   use for nova-novncproxy support ssl request, script use to generator ssl certification
 
-
+### project: migration
+>desc: from bare kvm to openstack,
+>document:https://onedrive.live.com/#cid=BA8F302535588103&id=BA8F302535588103%21381
