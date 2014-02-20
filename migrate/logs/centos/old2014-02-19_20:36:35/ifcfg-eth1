@@ -1,0 +1,6 @@
+# Realtek Semiconductor Co., Ltd. RTL-8139/8139C/8139C+
+DEVICE=eth1
+BOOTPROTO=static
+ONBOOT=yes
+IPADDR=10.202.62.21
+NETMASK=255.255.255.0

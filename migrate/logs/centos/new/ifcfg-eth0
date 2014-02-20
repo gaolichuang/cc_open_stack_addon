@@ -1,0 +1,8 @@
+DEVICE="eth0"
+BOOTPROTO="dhcp"
+IPV6INIT="yes"
+MTU="1500"
+NM_CONTROLLED="yes"
+ONBOOT="yes"
+TYPE="Ethernet"
+UUID="4826b5e2-f246-4a32-9003-0d08d4b85861"

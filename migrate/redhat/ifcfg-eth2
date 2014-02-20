@@ -1,0 +1,4 @@
+DEVICE="eth2"
+BOOTPROTO="dhcp"
+HWADDR=_MAC_ADDR_2_
+ONBOOT="yes"
