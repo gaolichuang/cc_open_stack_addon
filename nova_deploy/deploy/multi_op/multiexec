@@ -1,0 +1,107 @@
+#!/bin/bash
+
+. functions
+
+HOSTFILE=""
+RSHUSER="root"
+SWITCHUSER=""
+REMOTEPATH="."
+DEBUG=0
+PARALLEL=0
+
+usage () {
+    error "Execute command on multiple hosts" 
+    error "multiexec [OPTIONS] COMMAND"
+    error -e "\t-d\t\tPrint debug messages" 
+    error -e "\t-f FILE\t\tIndicate host list file. One host per line. If not given, hosts used." 
+    error -e "\t-u USER\t\tIndicate remote user used for ssh" 
+    error -e "\t-s USER\t\tIndicate the user who will execute the command on remote machine"
+    error -e "\t-p PATH\t\tEnter the PATH before executing command"
+    error -e "\t-h\t\tPrint this help message" 
+    error -e "\t-l\t\tEnable parallel mode"
+    error -e "\n\tNOTE: \"$%\" will be interpretered as remote host" 
+}
+
+
+while getopts "df:u:s:p:lh" opt; do
+    case $opt in
+        d ) DEBUG=1 ;;
+	f ) HOSTFILE=$OPTARG ;;
+	u ) RSHUSER=$OPTARG ;;
+	s ) SWITCHUSER=$OPTARG ;;
+	p ) REMOTEPATH=$OPTARG ;;
+	l ) PARALLEL=1 ;;
+	h ) usage; exit 0 ;;
+    esac
+done
+
+shift $(($OPTIND - 1))
+
+[ -z $HOSTFILE ] && error "Host file not given" && usage && exit 1
+
+command=$*
+
+[ -z "$command" ] && debug "No command given" && usage && exit 1
+hosts=`grep -v -E '^#' $HOSTFILE`
+[ -z "$hosts" ] && error "Empty host list" && exit 1
+
+debug "Host list: $hosts"
+
+
+if [ $PARALLEL -ne 0 ]; then
+    SCRDEF=/tmp/`uuidgen`.scr
+    windown_num=0
+fi   
+
+
+for h in $hosts; do
+
+    cmd=`echo $command | sed -n -e "s/$%/$h/g"p`
+    [ -z "$cmd" ] && cmd=$command
+
+    if [ $PARALLEL -ne 0 ]; then
+	if [ -z $SWITCHUSER ]; then
+	    echo "screen -t \"$h executing\" ssh -q $RSHUSER@$h \"cd $REMOTEPATH && $cmd\"" >> $SCRDEF
+	else
+	    echo "screen -t \"$h executing\" ssh -q $RSHUSER@$h \"cd $REMOTEPATH && sudo -u $SWITCHUSER $cmd\"" >> $SCRDEF
+	fi
+        window_num=$(($window_num+1))
+    else
+	echo "Executing on $h "
+	
+	if [ -z $SWITCHUSER ]; then
+	    debug "ssh $RSHUSER@$h $cmd  "
+	    ssh -q $RSHUSER@$h "cd $REMOTEPATH && $cmd"
+	else
+	    debug "ssh $RSHUSER@$h sudo -u $SWITCHUSER $cmd  "
+	    ssh -q $RSHUSER@$h "cd $REMOTEPATH && sudo -u $SWITCHUSER $cmd"
+	fi
+	
+	if [ $? -eq 0 ]; then
+	    echo_success
+	else
+	    echo_failure
+	fi
+    fi
+    
+done
+
+if [ $PARALLEL -ne 0 ]; then        
+    echo "select 0" >>$SCRDEF
+    i=1
+    while [ $i -lt $window_num ]; do
+        echo "split" >>$SCRDEF
+        echo "focus down" >>$SCRDEF
+        echo "select $i" >>$SCRDEF
+        i=$(($i+1))
+    done
+    if [ $DEBUG -ne 0 ]; then
+        echo "Screen definition as following:"
+        cat $SCRDEF
+        echo "Press enter to continue ..."
+        read
+    fi    
+    screen -c $SCRDEF
+    rm -f $SCRDEF 2>/dev/zero
+
+fi

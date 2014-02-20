@@ -1,0 +1,5 @@
+[client.volumes]
+	key = AQCL/aVSYAxgCxAAIg/LHBGwlrL4cW/QILF9QA==
+	caps mds = "allow r"
+	caps mon = "allow rw"
+	caps osd = "allow * pool=volumes"

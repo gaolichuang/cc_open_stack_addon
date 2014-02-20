@@ -1,0 +1,11 @@
+# Below is vip for each of every openstack related services
+192.168.1.101   keystone_vip keystone_vip.cp.chinacache.com
+192.168.1.102   glance_vip glance_vip.cp.chinacache.com
+192.168.1.103   cinder_vip cinder_vip.cp.chinacache.com
+192.168.1.105   nova_vip nova_vip.cp.chinacache.com
+192.168.1.106   neutron_vip neutron_vip.cp.chinacache.com
+192.168.1.110   network_vip network_vip.cp.chinacache.com
+192.168.1.107   ceilometer_vip ceilometer_vip.cp.chinacache.com
+192.168.1.108   mysql_vip mysql_vip.cp.chinacache.com
+192.168.1.109   rabbitmq_vip rabbitmq_vip.cp.chinacache.com
+

@@ -1,0 +1,5 @@
+[client.cinder]
+	key = AQAu/qVS8AB1HBAA7MArZ28MwLWG/5QhGmQ9BQ==
+	caps mds = "allow r"
+	caps mon = "allow rw"
+	caps osd = "allow * pool=backups"

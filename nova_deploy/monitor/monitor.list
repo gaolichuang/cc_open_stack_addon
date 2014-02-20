@@ -1,0 +1,3 @@
+bash binary_monitor.sh -b "nova-compute" -u "nova-compute.conf" -s "service nova-compute restart" -l "0610-computer1"
+bash binary_monitor.sh -b "nova-compute" -u "nova-compute.conf" -s "service nova-compute restart" -l "0608-computer6"
+bash binary_monitor.sh -b "nova-compute" -u "nova-compute.conf" -s "service nova-compute restart" -l "0608-computer5"

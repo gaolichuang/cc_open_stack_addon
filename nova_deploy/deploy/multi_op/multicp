@@ -1,0 +1,155 @@
+#!/bin/bash
+
+. functions
+
+HOSTFILE=""
+RSHUSER="root"
+CHOWNER=""
+REMOTEPATH="."
+SCPOPTS=""
+DEBUG=0
+QUIET=0
+PARALLEL=0
+RS_PARA=""
+
+usage () {
+    error "Copy file to multiple hosts" 
+    error "multicp [OPTIONS] localpath remotepath"
+    error -e "\t-d\t\tPrint debug messages" 
+    error -e "\t-f FILE\t\tIndicate host list file. One host per line" 
+    error -e "\t-u USER\t\tIndicate remote user used for ssh" 
+    error -e "\t-c USER\t\tChange owner to USER after copying file"
+    error -e "\t-r\t\tCopy directory recursively"
+    error -e "\t-q\t\tDon't ask me any thing, just do it"
+    error -e "\t-l\t\tEnable parallel mode"
+    error -e "\t-h\t\tPrint this help message" 
+    error -e "\t-p\t\trsync parameters"
+}
+
+confirm_chown () {
+
+    if [ -z $1 ]; then
+	return 0
+    fi
+
+    if [ $QUIET -eq 1 ]; then
+	return 0
+    fi
+
+    echo "CAUTION: With -c USER option, the remote path \"$remotefile\"'s owner will be changed to \"$1\" recursively."
+    echo -n "This may be dangerous. Are you sure? [y/n] "
+
+    read answer
+
+    if [ $answer = "y" ]; then
+	CHOWNER=$1
+    else
+	CHOWNER=""
+	exit 0
+    fi
+}
+
+while getopts "df:u:c:p:rqlh" opt; do
+    case $opt in
+        d ) DEBUG=1 ;;
+	f ) HOSTFILE=$OPTARG ;;
+	u ) RSHUSER=$OPTARG ;;
+	c ) CHOWNER=$OPTARG  ;;
+	r ) SCPOPTS="$SCPOPTS -r" ;; 
+	q ) QUIET=1 ;;
+	l ) PARALLEL=1 ;;
+	p ) RS_PARA="-$OPTARG" ;;
+	h ) usage; exit 0 ;;
+    esac
+done
+
+shift $(($OPTIND - 1))
+
+[ -z $HOSTFILE ] && error "Host file not given" && usage && exit 1
+
+
+localfile=$1
+remotefile=$2
+[ -z "$localfile" -o -z "$remotefile" ] && usage && exit 1
+
+debug "Local file: $localfile    Remote file: $remotefile"
+
+hosts=`grep -v -E '^#' $HOSTFILE`
+[ -z "$hosts" ] && error "Empty host list" && exit 1
+
+debug "Host list: $hosts"
+
+confirm_chown $CHOWNER
+
+if [ $PARALLEL -ne 0 ]; then
+    SCRDEF=/tmp/`uuidgen`.scr
+    windown_num=0
+fi
+
+for h in $hosts; do
+
+    cmd=`echo $command | sed -n -e "s/$%/$h/g"p`
+    [ -z "$cmd" ] && cmd=$command
+
+    echo "Copying file to $h "
+
+    if [ $PARALLEL -ne 0 ]; then
+	echo "screen -t \"$h copying\" rsync -r $RS_PARA --progress $localfile $h::root$remotefile" >> $SCRDEF
+	#echo "screen -t \"$h copying\" scp $SCPOPTS $localfile $RSHUSER@$h:$remotefile" >> $SCRDEF
+	window_num=$(($window_num+1))
+    else
+	echo "rsync -r $RS_PARA --progress $localfile $h::root$remotefile"
+#	rsync -r $RS_PARA --progress $localfile $h::root$remotefile
+	#rsync -az -r --progress $localfile $h::root$remotefile
+	scp $SCPOPTS $localfile $RSHUSER@$h:$remotefile
+	if [ $? -eq 0 ]; then
+	    echo_success
+	else
+	    echo_failure
+	    continue
+	fi
+	[ -z "$CHOWNER" ] && continue
+	echo -n "Changing file owner on $h"
+	ssh $RSHUSER@$h "chown -R $CHOWNER $remotefile"
+    
+	if [ $? -eq 0 ]; then
+	    echo_success
+	else
+	    echo_failure
+	fi
+    fi
+
+done
+
+
+if [ $PARALLEL -ne 0 ]; then
+    echo "select 0" >>$SCRDEF
+    i=1
+    while [ $i -lt $window_num ]; do
+	echo "split" >>$SCRDEF
+	echo "focus down" >>$SCRDEF
+	echo "select $i" >>$SCRDEF
+	i=$(($i+1))
+    done
+    if [ $DEBUG -ne 0 ]; then
+	echo "Screen definition as following:"
+	cat $SCRDEF
+	echo "Press enter to continue ..."
+	read
+    fi
+    screen -c $SCRDEF
+    rm -f $SCRDEF 2>/dev/zero
+    
+    if [ -n "$CHOWNER" ]; then
+	for h in $hosts; do
+	    echo -n "Changing file owner on $h"
+	    ssh $RSHUSER@$h "chown -R $CHOWNER $remotefile"
+	    
+	    if [ $? -eq 0 ]; then
+		echo_success
+	    else
+		echo_failure
+	    fi
+	done
+    fi
+fi

@@ -32,7 +32,7 @@ base on openstack, it is a project Container
 ### project: service_monitor
 >desc: monitor internal service, which use amqp rpc in manager
 >first should change some code, if eventlet thread hang, add greenthread.sleep at  nova/openstack/common/rpc/amqp.py  waiter.put
->use bascrpc  ping fuction to implement this monitor
+>use bascrpc ping fuction to implement this monitor
 
 ### project: ssl  
 >desc:   use for nova-novncproxy support ssl request, script use to generator ssl certification
@@ -40,3 +40,5 @@ base on openstack, it is a project Container
 ### project: migration
 >desc: from bare kvm to openstack,
 >document:https://onedrive.live.com/#cid=BA8F302535588103&id=BA8F302535588103%21381
+###  nova_deploy
+>some tools for deploy nova
