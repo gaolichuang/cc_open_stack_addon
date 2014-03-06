@@ -42,3 +42,6 @@ base on openstack, it is a project Container
 >document:https://onedrive.live.com/#cid=BA8F302535588103&id=BA8F302535588103%21381
 ###  nova_deploy
 >some tools for deploy nova
+###  cloud-init
+>cloud-init update base on cloud0.6.3: modify for support multinic
+>document:https://docs.google.com/document/d/1RipKhQA0Ev9Y-chhfwJAOmqzynObWe75o-yciSEgzNk/edit#
