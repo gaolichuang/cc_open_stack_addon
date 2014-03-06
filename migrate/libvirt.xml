@@ -1,0 +1,49 @@
+<domain type="kvm">
+  <uuid>79e045ac-9fa6-47ec-8c84-3851702989f5</uuid>
+  <name>instance-000000b4</name>
+  <memory>2097152</memory>
+  <vcpu>1</vcpu>
+  <sysinfo type="smbios">
+    <system>
+      <entry name="manufacturer">OpenStack Foundation</entry>
+      <entry name="product">OpenStack Nova</entry>
+      <entry name="version">2013.2</entry>
+      <entry name="serial">44454c4c-5700-1054-8038-c8c04f383358</entry>
+      <entry name="uuid">79e045ac-9fa6-47ec-8c84-3851702989f5</entry>
+    </system>
+  </sysinfo>
+  <os>
+    <type>hvm</type>
+    <boot dev="hd"/>
+    <smbios mode="sysinfo"/>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <clock offset="utc">
+    <timer name="pit" tickpolicy="delay"/>
+    <timer name="rtc" tickpolicy="catchup"/>
+  </clock>
+  <cpu mode="host-model" match="exact"/>
+  <devices>
+    <disk type="file" device="disk">
+      <driver name="qemu" type="qcow2" cache="none"/>
+      <source file="/var/lib/nova/instances/79e045ac-9fa6-47ec-8c84-3851702989f5/disk"/>
+      <target bus="virtio" dev="vda"/>
+    </disk>
+    <interface type="bridge">
+      <mac address="fa:16:3e:f7:47:21"/>
+      <model type="virtio"/>
+      <source bridge="qbr59879343-2e"/>
+      <target dev="tap59879343-2e"/>
+      <filterref filter="nova-instance-instance-000000b4-fa163ef74721"/>
+    </interface>
+    <serial type="file">
+      <source path="/var/lib/nova/instances/79e045ac-9fa6-47ec-8c84-3851702989f5/console.log"/>
+    </serial>
+    <serial type="pty"/>
+    <input type="tablet" bus="usb"/>
+    <graphics type="vnc" autoport="yes" keymap="en-us" listen="0.0.0.0"/>
+  </devices>
+</domain>

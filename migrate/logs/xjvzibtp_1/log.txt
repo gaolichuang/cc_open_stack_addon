@@ -1,0 +1,1 @@
+Delete at /var/lib/nova/instances/cd7e3530-8906-4850-9328-5610bf8fa552/disk file /root/setup.bat
