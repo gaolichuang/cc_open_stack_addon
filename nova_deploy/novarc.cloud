@@ -1,0 +1,6 @@
+export OS_USERNAME=daizhen.chao
+export OS_PASSWORD=daizhen.chao
+export OS_TENANT_NAME=daizhen.chao
+export OS_AUTH_URL=http://192.168.1.101:35357/v2.0
+#export OS_CACERT=/home/test/nova/ca.pem
+#export NEUTRONCLIENT_DEBUG=true

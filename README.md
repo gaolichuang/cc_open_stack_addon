@@ -38,10 +38,11 @@ base on openstack, it is a project Container
 >desc:   use for nova-novncproxy support ssl request, script use to generator ssl certification
 
 ### project: migration
->desc: from bare kvm to openstack,
->document:https://onedrive.live.com/#cid=BA8F302535588103&id=BA8F302535588103%21381
+>desc: from bare kvm to openstack, should update nova-compute.
+>document:https://drive.google.com/?usp=chrome_app#folders/0BzWB9fhjsDL1UzFLTW9DQm56VVk
+>modify nova-compute document: https://docs.google.com/document/d/1hJFN6mmRmrDubRYjFEJjDeEuo1ZhX9uUCzjXmtocBp4/edit
 ###  nova_deploy
 >some tools for deploy nova
 ###  cloud-init
->cloud-init update base on cloud0.6.3: modify for support multinic
+>cloud-init update base on cloud0.6.3: modify for support multinic, should update nova.api.metadata
 >document:https://docs.google.com/document/d/1RipKhQA0Ev9Y-chhfwJAOmqzynObWe75o-yciSEgzNk/edit#
