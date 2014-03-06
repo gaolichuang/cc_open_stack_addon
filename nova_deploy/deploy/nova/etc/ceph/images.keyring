@@ -1,5 +1,0 @@
-[client.images]
-	key = AQDD76ZSYO63EhAA6l6dqaMN3rFc9dIfLdlmFQ==
-	caps mds = "allow r"
-	caps mon = "allow rw"
-	caps osd = "allow * pool=images"
