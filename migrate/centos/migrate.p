@@ -1,8 +1,8 @@
 # your own logic here
 
-backup /etc/sysconfig/iptables
+#backup /etc/sysconfig/iptables
 backup /etc/udev/rules.d/70-persistent-net.rules
-delete /etc/sysconfig/iptables
+#delete /etc/sysconfig/iptables
 delete /etc/udev/rules.d/70-persistent-net.rules
 
 virt-ls -a $img_file /etc/sysconfig/network-scripts/ | while read line;do
@@ -15,11 +15,12 @@ virt-ls -a $img_file /etc/sysconfig/network-scripts/ | while read line;do
 done
 
 #inject
-copy_out /etc/sysconfig/iptables
-inject /etc/sysconfig/iptables
+#copy_out /etc/sysconfig/iptables
+#inject /etc/sysconfig/iptables
 copy_out /etc/udev/rules.d/70-persistent-net.rules
 inject /etc/udev/rules.d/70-persistent-net.rules
 
+echo "========================="
 virt-ls -a $new_img_file /etc/sysconfig/network-scripts/ | while read line;do
   if [[ $line == ifcfg-eth* ]];then
     #backup

@@ -23,6 +23,7 @@ Usage="bash $CMD -t <os_type> -i <image_file> -v <virtual machine name> -x <libv
            -o: image file which create by new platform\n
            -v; virtual machine name\n
            -x: new plantform libvirt.xml file path(use to get hwaddr)\n
+           -d: have too disk or not\n
            -R: use -R means roll back the image file adjust\n
        bash $CMD -h"
 
@@ -48,10 +49,13 @@ if [ ! -f $workpath/script_template.sh ];then
 fi
 
 rollback="no"
-while getopts "t:i:o:v:x:Rh" opt;do
+twodisk="no"
+while getopts "t:i:o:v:x:Rhd" opt;do
  case $opt in
   h ) echo -e $Usage
     exit 1
+    ;;
+  d ) twodisk="yes"
     ;;
   R) rollback="yes"
     ;;
@@ -69,7 +73,7 @@ while getopts "t:i:o:v:x:Rh" opt;do
     exit 1;;
  esac
 done
-echo "workpath=$workpath,os_type=$os_type,hwaddr=$hwaddr,image_file=$image_file,new_image_file=$image_file,vm_name=$vm_name,rollback:$rollback"
+echo "workpath=$workpath,os_type=$os_type,hwaddr=$hwaddr,image_file=$image_file,new_image_file=$image_file,vm_name=$vm_name,rollback:$rollback,twodisk:$twodisk"
 
 ###verify input params
 if [ -z $os_type ];then
@@ -199,11 +203,11 @@ create_script
 
 if [ $rollback == "yes" ];then
     # vm_name new_img_file  img_file  libvirt.xml  rollback_version
-    echo "============Rollback Start $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $rollback_version"
-    bash $workpath/$os_type/rollback.sh $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $rollback_version
-    echo "============Rollback Finish $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $rollback_version"
+    echo "============Rollback Start $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $twodisk $rollback_version"
+    bash $workpath/$os_type/rollback.sh $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $twodisk $rollback_version
+    echo "============Rollback Finish $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $twodisk $rollback_version"
 else
-    echo "============Migrate Start $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $rollback_version"
-    bash $workpath/$os_type/migrate.sh $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $rollback_version
-    echo "============Migrate Finish $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $rollback_version"
+    echo "============Migrate Start $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $twodisk $rollback_version"
+    bash $workpath/$os_type/migrate.sh $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $twodisk $rollback_version
+    echo "============Migrate Finish $workpath/logs/$vm_name $new_image_file $image_file $hwaddr $twodisk $rollback_version"
 fi
