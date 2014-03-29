@@ -90,6 +90,7 @@ if [[ $0 == /etc/network/if-up.d* ]];then
   if [ "$IFACE" != "$INTERFACE1ST" ];then
     grep "${IFACE#eth} ${IFACE}_table" /etc/iproute2/rt_tables  > /dev/null 2>&1
     if [ $? -ne 0 ];then
+      #TODO(gaolichuang@gmail.com): make sure the first number field is unique at /etc/iproute2/rt_tables
       echo "${IFACE#eth} ${IFACE}_table" >> /etc/iproute2/rt_tables
     fi
     # the route below should always set
