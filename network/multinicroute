@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# Use for: use for multi nics and multi default gw work together
+# ref: http://kindlund.wordpress.com/2007/11/19/configuring-multiple-default-routes-in-linux/
+# this script only test pass for ubuntu, it treat eth0 as the first interface
+# this script should put at /etc/network/if-up.d/ and chmod 755 for it
+# this script run for every interface, order by /etc/network/interfaces configuration
+
+DEBUG=true
+INTERFACE1ST="eth0"
+METRICBASE=100
+METRICDETAL=10
+
+translate_netmask() {
+netmask2=`echo $1 | awk -F "." '{for (i=1;i<=NF;i++) print $i}' | while read line;do echo "obase=2;$line"|bc;done | while read line;do echo -n $line;done`
+netmask2=${netmask2/0*}
+return ${#netmask2}
+}
+get_nic_info(){
+### work good for ubuntu
+###  get default gw for $IFACE from  /var/lib/dhcp/dhclient.eth0.leases
+DEFAULTGW=`grep "option routers" /var/lib/dhcp/dhclient.$IFACE.leases 2>/dev/null | head -1 `
+DEFAULTGW=${DEFAULTGW##*routers}
+DEFAULTGW=${DEFAULTGW%%;}
+FIXEDIP=`grep "fixed-address" /var/lib/dhcp/dhclient.$IFACE.leases 2>/dev/null | head -1`
+FIXEDIP=${FIXEDIP##*fixed-address}
+FIXEDIP=${FIXEDIP%%;}
+NETMASK=`grep "subnet-mask" /var/lib/dhcp/dhclient.$IFACE.leases 2>/dev/null | head -1`
+NETMASK=${FIXEDIP##*subnet-mask}
+NETMASK=${FIXEDIP%%;}
+translate_netmask $NETMASK
+NETMASK2=$?
+}
+translate_netmask_test() {
+translate_netmask  "255.255.255.0"
+$DEBUG && echo $?
+translate_netmask  "255.255.255.255"
+$DEBUG && echo $?
+translate_netmask  "255.255.255.240"
+$DEBUG && echo $?
+}
+
+
+# only support dhcp method
+if [ "$METHOD" != "dhcp" ];then
+  exit 2
+fi
+
+#if [[ $0 == /etc/network/if-post-down.d* ]];then
+#  # rm default gw for $INTERFACE1ST as the first default gw
+#elif [[ $0 == /etc/network/if-up.d* ]];then
+if [[ $0 == /etc/network/if-up.d* ]];then
+  get_nic_info
+  $DEBUG && echo "$IFACE default gw $DEFAULTGW, fixedip $FIXEDIP"
+  metric=$(($METRICBASE+$METRICDETAL*${IFACE##eth}))
+  route | awk '$1~"default" && $8=="'$IFACE'" && $5!="'$metric'" {gw=$2; metric=$5;iface=$8;system("route del default gw "gw" metric "metric) }'
+  route | grep "default" | grep $DEFAULTGW | grep $IFACE > /dev/null 2>&1
+  if [ $? -ne 0 ];then
+    $DEBUG && echo "route add default gw $DEFAULTGW metric $metric"
+    route add default gw $DEFAULTGW metric $metric
+  fi
+  if [ "$IFACE" != "$INTERFACE1ST" ];then
+    grep "1 ${IFACE}_table" /etc/iproute2/rt_tables  > /dev/null 2>&1
+    if [ $? -ne 0 ];then
+      # use another iptable for ethX, default for eth0
+      echo "1 ${IFACE}_table" >> /etc/iproute2/rt_tables
+    fi
+    # the route below should always set
+    ip route add $FIXEDIP/$NETMASK2 dev $IFACE src $FIXEDIP table ${IFACE}_table
+    $DEBUG && echo "ip route add $FIXEDIP/$NETMASK2 dev $IFACE src $FIXEDIP table ${IFACE}_table"
+    ip route add default via $DEFAULTGW dev $IFACE table ${IFACE}_table
+    $DEBUG && echo "ip route add default via $DEFAULTGW dev $IFACE table ${IFACE}_table"
+    ip rule show | grep ${IFACE}_table | grep $FIXEDIP > /dev/null 2>&1
+    if [ $? -ne 0 ];then
+      ip rule add from $FIXEDIP/32 table ${IFACE}_table
+      $DEBUG && echo "ip rule add from $FIXEDIP/32 table ${IFACE}_table"
+      ip rule add to $FIXEDIP/32 table ${IFACE}_table
+      $DEBUG && echo "ip rule add to $FIXEDIP/32 table ${IFACE}_table"
+    fi
+  fi
+fi

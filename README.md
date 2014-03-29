@@ -46,3 +46,7 @@ base on openstack, it is a project Container
 ###  cloud-init
 >cloud-init update base on cloud0.6.3: modify for support multinic, should update nova.api.metadata
 >document:https://docs.google.com/document/d/1RipKhQA0Ev9Y-chhfwJAOmqzynObWe75o-yciSEgzNk/edit#
+
+### network/multinicroute
+>fix two default gw all work for ubuntu
+
