@@ -26,8 +26,8 @@ FIXEDIP=`grep "fixed-address" /var/lib/dhcp/dhclient.$IFACE.leases 2>/dev/null |
 FIXEDIP=${FIXEDIP##*fixed-address}
 FIXEDIP=${FIXEDIP%%;}
 NETMASK=`grep "subnet-mask" /var/lib/dhcp/dhclient.$IFACE.leases 2>/dev/null | head -1`
-NETMASK=${FIXEDIP##*subnet-mask}
-NETMASK=${FIXEDIP%%;}
+NETMASK=${NETMASK##*subnet-mask}
+NETMASK=${NETMASK%%;}
 translate_netmask $NETMASK
 NETMASK2=$?
 }
