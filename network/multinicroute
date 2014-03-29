@@ -30,6 +30,34 @@ NETMASK=${NETMASK##*subnet-mask}
 NETMASK=${NETMASK%%;}
 translate_netmask $NETMASK
 NETMASK2=$?
+POSTFIX_ADDR=$FIXEDIP
+POSTFIX_MASK=$NETMASK
+
+PERFIX_ADDR=${POSTFIX_ADDR%%.*}
+POSTFIX_ADDR=${POSTFIX_ADDR#*.}
+PERFIX_MASK=${POSTFIX_MASK%%.*}
+POSTFIX_MASK=${POSTFIX_MASK#*.}
+NETADDR=$(($PERFIX_ADDR&$PERFIX_MASK))
+#echo "perfix addr $PERFIX_ADDR, post addr $POSTFIX_ADDR, perfix mask $PERFIX_MASK, post mask $POSTFIX_MASK,net addr $NETADDR"
+
+PERFIX_ADDR=${POSTFIX_ADDR%%.*}
+POSTFIX_ADDR=${POSTFIX_ADDR#*.}
+PERFIX_MASK=${POSTFIX_MASK%%.*}
+POSTFIX_MASK=${POSTFIX_MASK#*.}
+NETADDR=${NETADDR}.$(($PERFIX_ADDR&$PERFIX_MASK))
+#echo "perfix addr $PERFIX_ADDR, post addr $POSTFIX_ADDR, perfix mask $PERFIX_MASK, post mask $POSTFIX_MASK,net addr $NETADDR"
+
+PERFIX_ADDR=${POSTFIX_ADDR%%.*}
+POSTFIX_ADDR=${POSTFIX_ADDR#*.}
+PERFIX_MASK=${POSTFIX_MASK%%.*}
+POSTFIX_MASK=${POSTFIX_MASK#*.}
+NETADDR=${NETADDR}.$(($PERFIX_ADDR&$PERFIX_MASK))
+#echo "perfix addr $PERFIX_ADDR, post addr $POSTFIX_ADDR, perfix mask $PERFIX_MASK, post mask $POSTFIX_MASK,net addr $NETADDR"
+
+PERFIX_ADDR=${POSTFIX_ADDR%%.*}
+PERFIX_MASK=${POSTFIX_MASK%%.*}
+NETADDR=${NETADDR}.$(($PERFIX_ADDR&$PERFIX_MASK))
+#echo "perfix addr $PERFIX_ADDR, post addr $POSTFIX_ADDR, perfix mask $PERFIX_MASK, post mask $POSTFIX_MASK,net addr $NETADDR"
 }
 translate_netmask_test() {
 translate_netmask  "255.255.255.0"
@@ -51,7 +79,7 @@ fi
 #elif [[ $0 == /etc/network/if-up.d* ]];then
 if [[ $0 == /etc/network/if-up.d* ]];then
   get_nic_info
-  $DEBUG && echo "$IFACE default gw $DEFAULTGW, fixedip $FIXEDIP"
+  $DEBUG && echo "$IFACE default gw $DEFAULTGW, fixedip $FIXEDIP, netmask $NETMASK  $NETMASK2 netaddr $NETADDR"
   metric=$(($METRICBASE+$METRICDETAL*${IFACE##eth}))
   route | awk '$1~"default" && $8=="'$IFACE'" && $5!="'$metric'" {gw=$2; metric=$5;iface=$8;system("route del default gw "gw" metric "metric) }'
   route | grep "default" | grep $DEFAULTGW | grep $IFACE > /dev/null 2>&1
@@ -60,13 +88,12 @@ if [[ $0 == /etc/network/if-up.d* ]];then
     route add default gw $DEFAULTGW metric $metric
   fi
   if [ "$IFACE" != "$INTERFACE1ST" ];then
-    grep "1 ${IFACE}_table" /etc/iproute2/rt_tables  > /dev/null 2>&1
+    grep "${IFACE#eth} ${IFACE}_table" /etc/iproute2/rt_tables  > /dev/null 2>&1
     if [ $? -ne 0 ];then
-      # use another iptable for ethX, default for eth0
-      echo "1 ${IFACE}_table" >> /etc/iproute2/rt_tables
+      echo "${IFACE#eth} ${IFACE}_table" >> /etc/iproute2/rt_tables
     fi
     # the route below should always set
-    ip route add $FIXEDIP/$NETMASK2 dev $IFACE src $FIXEDIP table ${IFACE}_table
+    ip route add $NETADDR/$NETMASK2 dev $IFACE src $FIXEDIP table ${IFACE}_table
     $DEBUG && echo "ip route add $FIXEDIP/$NETMASK2 dev $IFACE src $FIXEDIP table ${IFACE}_table"
     ip route add default via $DEFAULTGW dev $IFACE table ${IFACE}_table
     $DEBUG && echo "ip route add default via $DEFAULTGW dev $IFACE table ${IFACE}_table"
